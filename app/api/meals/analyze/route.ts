@@ -7,6 +7,7 @@ import { MEAL_ANALYSIS_SYSTEM_PROMPT } from "@/prompts/meal-analysis";
 import { NutritionSchema } from "@/types/Nutrition";
 
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 const AnalysisResponseSchema = z.object({
   foodItems: z.array(

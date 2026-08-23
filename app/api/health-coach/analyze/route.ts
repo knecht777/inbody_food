@@ -6,6 +6,7 @@ import { HEALTH_COACH_SYSTEM_PROMPT } from "@/prompts/health-coach";
 import { DailyNutritionSchema } from "@/types/Nutrition";
 
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 const AnalysisResponseSchema = z.object({
   summary: z.string(),

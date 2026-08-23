@@ -6,6 +6,7 @@ import { REPORT_SYSTEM_PROMPT } from "@/prompts/report";
 import { NutritionSchema } from "@/types/Nutrition";
 
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 const RequestBodySchema = z.object({
   periodLabel: z.string(),
