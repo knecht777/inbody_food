@@ -3,12 +3,7 @@ import "server-only";
 const GEMINI_API_URL =
   "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent";
 
-export async function analyzeImageWithGemini(params: {
-  systemPrompt: string;
-  userPrompt: string;
-  imageBase64: string;
-  mediaType: string;
-}): Promise<string> {
+async function callGemini(systemPrompt: string, parts: object[]): Promise<string> {
   const apiKey = process.env.AI_API_KEY;
   if (!apiKey) {
     throw new Error("AI_API_KEY is not configured");
@@ -18,21 +13,8 @@ export async function analyzeImageWithGemini(params: {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
-      systemInstruction: { parts: [{ text: params.systemPrompt }] },
-      contents: [
-        {
-          role: "user",
-          parts: [
-            { text: params.userPrompt },
-            {
-              inlineData: {
-                mimeType: params.mediaType,
-                data: params.imageBase64,
-              },
-            },
-          ],
-        },
-      ],
+      systemInstruction: { parts: [{ text: systemPrompt }] },
+      contents: [{ role: "user", parts }],
       generationConfig: {
         responseMimeType: "application/json",
       },
@@ -50,4 +32,20 @@ export async function analyzeImageWithGemini(params: {
     throw new Error("Gemini response contained no text content");
   }
   return text as string;
+}
+
+export function analyzeImageWithGemini(params: {
+  systemPrompt: string;
+  userPrompt: string;
+  imageBase64: string;
+  mediaType: string;
+}): Promise<string> {
+  return callGemini(params.systemPrompt, [
+    { text: params.userPrompt },
+    { inlineData: { mimeType: params.mediaType, data: params.imageBase64 } },
+  ]);
+}
+
+export function generateTextWithGemini(systemPrompt: string, userPrompt: string): Promise<string> {
+  return callGemini(systemPrompt, [{ text: userPrompt }]);
 }

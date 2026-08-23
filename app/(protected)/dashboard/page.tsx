@@ -7,8 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
+import { getActiveGoal } from "@/services/body/goals";
 import { addWeightLog, listWeightLogs } from "@/services/body/weightLogs";
 import { dateIdFor, getDailyNutrition } from "@/services/nutrition/dailyNutrition";
+import { getAIAnalysis, saveAIAnalysis } from "@/services/reports/aiAnalyses";
+import type { AIAnalysis } from "@/types/AIAnalysis";
 import type { DailyNutrition } from "@/types/Nutrition";
 import type { WeightLog } from "@/types/WeightLog";
 
@@ -27,6 +30,10 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [weightInput, setWeightInput] = useState("");
   const [logging, setLogging] = useState(false);
+  const [targetWeightKg, setTargetWeightKg] = useState<number | null>(null);
+  const [aiAnalysis, setAiAnalysis] = useState<AIAnalysis | null>(null);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
 
   async function refreshWeightLogs(uid: string, days: number) {
     setWeightLogs(await listWeightLogs(uid, days));
@@ -35,19 +42,56 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!user) return;
     let cancelled = false;
+    const today = dateIdFor(new Date());
     Promise.all([
-      getDailyNutrition(user.uid, dateIdFor(new Date())),
+      getDailyNutrition(user.uid, today),
       listWeightLogs(user.uid, rangeDays),
-    ]).then(([nutrition, logs]) => {
+      getActiveGoal(user.uid),
+      getAIAnalysis(user.uid, today),
+    ]).then(([nutrition, logs, goal, analysis]) => {
       if (cancelled) return;
       setDailyNutrition(nutrition);
       setWeightLogs(logs);
+      setTargetWeightKg(goal?.targetWeightKg ?? null);
+      setAiAnalysis(analysis);
       setLoading(false);
     });
     return () => {
       cancelled = true;
     };
   }, [user, rangeDays]);
+
+  async function handleGenerateAnalysis() {
+    if (!user) return;
+    setAnalyzing(true);
+    setAnalysisError(null);
+    try {
+      const idToken = await user.getIdToken();
+      const response = await fetch("/api/health-coach/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${idToken}`,
+        },
+        body: JSON.stringify({
+          dailyNutrition,
+          recentWeightsKg: weightLogs.map((log) => log.weightKg),
+          targetWeightKg,
+        }),
+      });
+      if (!response.ok) throw new Error("analysis failed");
+      const { summary, recommendations } = (await response.json()) as {
+        summary: string;
+        recommendations: string[];
+      };
+      const saved = await saveAIAnalysis(user.uid, dateIdFor(new Date()), summary, recommendations);
+      setAiAnalysis(saved);
+    } catch {
+      setAnalysisError("AI 분석에 실패했습니다. 잠시 후 다시 시도해 주세요.");
+    } finally {
+      setAnalyzing(false);
+    }
+  }
 
   async function handleLogWeight(event: FormEvent) {
     event.preventDefault();
@@ -100,6 +144,36 @@ export default function DashboardPage() {
             unit="g"
           />
           <NutrientBar label="지방" current={nutrition.fat} target={nutrition.targetFat} unit="g" />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>AI 코치</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-3">
+          {aiAnalysis ? (
+            <>
+              <p className="text-sm">{aiAnalysis.summary}</p>
+              <ul className="list-disc pl-5 text-sm text-muted-foreground">
+                {aiAnalysis.recommendations.map((rec, i) => (
+                  <li key={i}>{rec}</li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <p className="text-sm text-muted-foreground">아직 오늘의 분석을 받지 않았습니다.</p>
+          )}
+          {analysisError && <p className="text-sm text-destructive">{analysisError}</p>}
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleGenerateAnalysis}
+            disabled={analyzing}
+            className="w-fit"
+          >
+            {analyzing ? "분석 중..." : aiAnalysis ? "다시 분석" : "오늘 분석 받기"}
+          </Button>
         </CardContent>
       </Card>
 
