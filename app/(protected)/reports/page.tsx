@@ -1,5 +1,6 @@
 "use client";
 
+import { CalendarDays, CalendarRange } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -124,7 +125,10 @@ export default function ReportsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>주간 리포트 ({weekId})</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <CalendarRange className="size-4 text-primary" />
+            주간 리포트 ({weekId})
+          </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           {weekly ? (
@@ -162,7 +166,10 @@ export default function ReportsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>월간 리포트 ({monthId})</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <CalendarDays className="size-4 text-primary" />
+            월간 리포트 ({monthId})
+          </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           {monthly ? (

@@ -1,5 +1,6 @@
 "use client";
 
+import { UserCircle } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -74,7 +75,10 @@ export default function SettingsPage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>프로필</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <UserCircle className="size-4 text-primary" />
+          프로필
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">

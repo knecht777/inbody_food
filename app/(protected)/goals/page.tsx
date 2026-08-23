@@ -1,5 +1,6 @@
 "use client";
 
+import { CheckCircle2, Target } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
@@ -97,7 +98,10 @@ export default function GoalsPage() {
     <div className="flex flex-col gap-6">
       <Card>
         <CardHeader>
-          <CardTitle>목표 체중 설정</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Target className="size-4 text-primary" />
+            목표 체중 설정
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -135,7 +139,10 @@ export default function GoalsPage() {
       {activeGoal && (
         <Card>
           <CardHeader>
-            <CardTitle>현재 목표</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <CheckCircle2 className="size-4 text-primary" />
+              현재 목표
+            </CardTitle>
           </CardHeader>
           <CardContent className="text-sm text-muted-foreground">
             목표 체중 {activeGoal.targetWeightKg}kg · {activeGoal.targetCalories}kcal /{" "}

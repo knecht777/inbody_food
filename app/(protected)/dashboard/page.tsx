@@ -1,5 +1,6 @@
 "use client";
 
+import { Flame, Scale, Sparkles, TrendingUp } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 import { NutrientBar } from "@/components/NutrientBar";
 import { WeightTrendChart } from "@/components/WeightTrendChart";
@@ -149,7 +150,10 @@ export default function DashboardPage() {
     <div className="flex flex-col gap-6">
       <Card>
         <CardHeader>
-          <CardTitle>오늘의 영양</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Flame className="size-4 text-primary" />
+            오늘의 영양
+          </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <NutrientBar
@@ -176,7 +180,10 @@ export default function DashboardPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>AI 코치</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Sparkles className="size-4 text-primary" />
+            AI 코치
+          </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
           {aiAnalysis ? (
@@ -228,7 +235,10 @@ export default function DashboardPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>체중 기록</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Scale className="size-4 text-primary" />
+            체중 기록
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogWeight} className="flex gap-2">
@@ -248,7 +258,10 @@ export default function DashboardPage() {
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>체중 추이</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="size-4 text-primary" />
+            체중 추이
+          </CardTitle>
           <div className="flex gap-1">
             {RANGE_OPTIONS.map((opt) => (
               <button

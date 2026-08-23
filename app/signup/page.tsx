@@ -4,8 +4,8 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
+import { AuthShell } from "@/components/AuthShell";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { auth } from "@/lib/firebase/config";
@@ -45,47 +45,40 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle>회원가입</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="email">이메일</Label>
-              <Input
-                id="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="password">비밀번호</Label>
-              <Input
-                id="password"
-                type="password"
-                required
-                minLength={6}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            {error && <p className="text-sm text-destructive">{error}</p>}
-            <Button type="submit" disabled={submitting}>
-              {submitting ? "가입 중..." : "회원가입"}
-            </Button>
-          </form>
-          <div className="mt-4 text-sm text-muted-foreground">
-            이미 계정이 있으신가요?{" "}
-            <Link href="/login" className="hover:underline">
-              로그인
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+    <AuthShell title="회원가입">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="email">이메일</Label>
+          <Input
+            id="email"
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="password">비밀번호</Label>
+          <Input
+            id="password"
+            type="password"
+            required
+            minLength={6}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+        {error && <p className="text-sm text-destructive">{error}</p>}
+        <Button type="submit" disabled={submitting} className="mt-1">
+          {submitting ? "가입 중..." : "회원가입"}
+        </Button>
+      </form>
+      <div className="mt-4 text-sm text-muted-foreground">
+        이미 계정이 있으신가요?{" "}
+        <Link href="/login" className="text-foreground hover:underline">
+          로그인
+        </Link>
+      </div>
+    </AuthShell>
   );
 }

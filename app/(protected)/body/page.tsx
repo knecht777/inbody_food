@@ -1,5 +1,6 @@
 "use client";
 
+import { Camera, History, Info, TrendingUp } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 import { BodyTrendChart } from "@/components/BodyTrendChart";
 import { Button } from "@/components/ui/button";
@@ -140,7 +141,10 @@ export default function BodyPage() {
     <div className="flex flex-col gap-6">
       <Card>
         <CardHeader>
-          <CardTitle>인바디 기록 추가</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Camera className="size-4 text-primary" />
+            인바디 기록 추가
+          </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
@@ -228,7 +232,10 @@ export default function BodyPage() {
       {(bmiInfo || bodyFatInfo) && (
         <Card>
           <CardHeader>
-            <CardTitle>최근 측정 기준</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Info className="size-4 text-primary" />
+              최근 측정 기준
+            </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-2 text-sm">
             {bmiInfo && (
@@ -251,7 +258,10 @@ export default function BodyPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>체성분 추이</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="size-4 text-primary" />
+            체성분 추이
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {loading ? (
@@ -264,7 +274,10 @@ export default function BodyPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>기록 히스토리</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <History className="size-4 text-primary" />
+            기록 히스토리
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {loading ? (

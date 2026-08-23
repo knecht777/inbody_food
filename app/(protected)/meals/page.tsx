@@ -1,5 +1,6 @@
 "use client";
 
+import { Camera } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 import { MealCard } from "@/components/MealCard";
 import { Button } from "@/components/ui/button";
@@ -120,7 +121,10 @@ export default function MealsPage() {
     <div className="flex flex-col gap-6">
       <Card>
         <CardHeader>
-          <CardTitle>식사 사진 업로드</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Camera className="size-4 text-primary" />
+            식사 사진 업로드
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleUpload} className="flex flex-col gap-4">
