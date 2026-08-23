@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "대시보드" },
+  { href: "/meals", label: "식사" },
   { href: "/body", label: "인바디" },
   { href: "/goals", label: "목표" },
   { href: "/settings", label: "프로필" },

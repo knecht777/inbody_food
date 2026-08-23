@@ -7,7 +7,8 @@ AI 분석, 체중/영양 대시보드, Notion 연동을 제공한다.
 
 - **Frontend**: Next.js 16 (App Router) + TypeScript + Tailwind CSS + shadcn/ui + Recharts
 - **Hosting**: Vercel
-- **Backend**: Firebase (Authentication, Firestore, Storage, Cloud Functions)
+- **Backend**: Firebase (Authentication, Firestore, Cloud Functions)
+- **Image Storage**: Vercel Blob (meal / InBody photos — see [docs/image-storage-decision.md](docs/image-storage-decision.md))
 - **AI**: Multimodal AI API (식사 사진 분석)
 - **External**: Notion API (장기 기록 / 개인 대시보드)
 
