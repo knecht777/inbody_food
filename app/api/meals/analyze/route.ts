@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { analyzeImageWithClaude } from "@/lib/ai/claude";
+import { analyzeImageWithGemini } from "@/lib/ai/gemini";
 import { adminAuth } from "@/lib/firebase/admin";
 import { MEAL_ANALYSIS_SYSTEM_PROMPT } from "@/prompts/meal-analysis";
 import { NutritionSchema } from "@/types/Nutrition";
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
 
   let rawText: string;
   try {
-    rawText = await analyzeImageWithClaude({
+    rawText = await analyzeImageWithGemini({
       systemPrompt: MEAL_ANALYSIS_SYSTEM_PROMPT,
       userPrompt: "이 사진 속 음식을 분석해 주세요.",
       imageBase64,

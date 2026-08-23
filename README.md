@@ -9,7 +9,7 @@ AI 분석, 체중/영양 대시보드, Notion 연동을 제공한다.
 - **Hosting**: Vercel
 - **Backend**: Firebase (Authentication, Firestore, Cloud Functions)
 - **Image Storage**: Vercel Blob (meal / InBody photos — see [docs/image-storage-decision.md](docs/image-storage-decision.md))
-- **AI**: Multimodal AI API (식사 사진 분석)
+- **AI**: Google Gemini API (식사 사진 분석, 무료 티어)
 - **External**: Notion API (장기 기록 / 개인 대시보드)
 
 아키텍처 전체 설명은 [docs/](docs/)를 참고.
