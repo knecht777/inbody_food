@@ -1,11 +1,14 @@
-import { collection, doc, getDoc, getDocs, query, setDoc, where } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, orderBy, query, setDoc, where } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
+import { dateIdFor } from "@/lib/health/dates";
 import { getActiveGoal } from "@/services/body/goals";
 import type { DailyNutrition } from "@/types/Nutrition";
 import type { Meal } from "@/types/Meal";
 
-export function dateIdFor(date: Date): string {
-  return date.toISOString().slice(0, 10);
+export { dateIdFor };
+
+function dailyNutritionRef(uid: string) {
+  return collection(db, "users", uid, "dailyNutrition");
 }
 
 function mealsRef(uid: string) {
@@ -22,6 +25,21 @@ export async function getDailyNutrition(
 ): Promise<DailyNutrition | null> {
   const snapshot = await getDoc(dailyNutritionDoc(uid, dateId));
   return snapshot.exists() ? (snapshot.data() as DailyNutrition) : null;
+}
+
+export async function listDailyNutritionInRange(
+  uid: string,
+  startDateId: string,
+  endDateId: string,
+): Promise<DailyNutrition[]> {
+  const q = query(
+    dailyNutritionRef(uid),
+    where("dateId", ">=", startDateId),
+    where("dateId", "<=", endDateId),
+    orderBy("dateId", "asc"),
+  );
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((d) => d.data() as DailyNutrition);
 }
 
 export async function recalculateDailyNutrition(uid: string, dateId: string): Promise<void> {

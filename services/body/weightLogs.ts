@@ -31,3 +31,18 @@ export async function listWeightLogs(uid: string, sinceDays: number): Promise<We
   const snapshot = await getDocs(q);
   return snapshot.docs.map((d) => d.data() as WeightLog);
 }
+
+export async function listWeightLogsInRange(
+  uid: string,
+  startDateId: string,
+  endDateId: string,
+): Promise<WeightLog[]> {
+  const q = query(
+    weightLogsRef(uid),
+    where("loggedAt", ">=", `${startDateId}T00:00:00.000Z`),
+    where("loggedAt", "<=", `${endDateId}T23:59:59.999Z`),
+    orderBy("loggedAt", "asc"),
+  );
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((d) => d.data() as WeightLog);
+}

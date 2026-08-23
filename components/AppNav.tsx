@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { href: "/meals", label: "식사" },
   { href: "/body", label: "인바디" },
   { href: "/goals", label: "목표" },
+  { href: "/reports", label: "리포트" },
   { href: "/settings", label: "프로필" },
 ];
 
