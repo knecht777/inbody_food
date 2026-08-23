@@ -1,7 +1,7 @@
 {
   "projects": {
-    "default": "REPLACE_WITH_health-app-dev",
-    "development": "REPLACE_WITH_health-app-dev",
-    "production": "REPLACE_WITH_health-app-prod"
+    "default": "health-app-dev-7444b",
+    "development": "health-app-dev-7444b",
+    "production": "health-app-prod-1699c"
   }
 }
