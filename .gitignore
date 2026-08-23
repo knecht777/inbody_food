@@ -51,3 +51,6 @@ serviceAccountKey*.json
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# claude code session state
+.claude/scheduled_tasks.lock
