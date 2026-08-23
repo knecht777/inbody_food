@@ -11,6 +11,7 @@ import { getActiveGoal } from "@/services/body/goals";
 import { addWeightLog, listWeightLogs } from "@/services/body/weightLogs";
 import { dateIdFor, getDailyNutrition } from "@/services/nutrition/dailyNutrition";
 import { getAIAnalysis, saveAIAnalysis } from "@/services/reports/aiAnalyses";
+import { syncDayToNotion } from "@/services/reports/notionSync";
 import type { AIAnalysis } from "@/types/AIAnalysis";
 import type { DailyNutrition } from "@/types/Nutrition";
 import type { WeightLog } from "@/types/WeightLog";
@@ -34,6 +35,9 @@ export default function DashboardPage() {
   const [aiAnalysis, setAiAnalysis] = useState<AIAnalysis | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
+  const [notionSyncing, setNotionSyncing] = useState(false);
+  const [notionError, setNotionError] = useState<string | null>(null);
+  const [notionPageUrl, setNotionPageUrl] = useState<string | null>(null);
 
   async function refreshWeightLogs(uid: string, days: number) {
     setWeightLogs(await listWeightLogs(uid, days));
@@ -90,6 +94,29 @@ export default function DashboardPage() {
       setAnalysisError("AI 분석에 실패했습니다. 잠시 후 다시 시도해 주세요.");
     } finally {
       setAnalyzing(false);
+    }
+  }
+
+  async function handleSyncToNotion() {
+    if (!user || !aiAnalysis) return;
+    setNotionSyncing(true);
+    setNotionError(null);
+    try {
+      const url = await syncDayToNotion(user, {
+        dateId: dateIdFor(new Date()),
+        calories: nutrition.calories,
+        protein: nutrition.protein,
+        carbs: nutrition.carbs,
+        fat: nutrition.fat,
+        weightKg: weightLogs.at(-1)?.weightKg ?? null,
+        summary: aiAnalysis.summary,
+        recommendations: aiAnalysis.recommendations,
+      });
+      setNotionPageUrl(url);
+    } catch {
+      setNotionError("Notion 동기화에 실패했습니다.");
+    } finally {
+      setNotionSyncing(false);
     }
   }
 
@@ -165,15 +192,37 @@ export default function DashboardPage() {
             <p className="text-sm text-muted-foreground">아직 오늘의 분석을 받지 않았습니다.</p>
           )}
           {analysisError && <p className="text-sm text-destructive">{analysisError}</p>}
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleGenerateAnalysis}
-            disabled={analyzing}
-            className="w-fit"
-          >
-            {analyzing ? "분석 중..." : aiAnalysis ? "다시 분석" : "오늘 분석 받기"}
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleGenerateAnalysis}
+              disabled={analyzing}
+            >
+              {analyzing ? "분석 중..." : aiAnalysis ? "다시 분석" : "오늘 분석 받기"}
+            </Button>
+            {aiAnalysis && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleSyncToNotion}
+                disabled={notionSyncing}
+              >
+                {notionSyncing ? "동기화 중..." : "Notion에 동기화"}
+              </Button>
+            )}
+          </div>
+          {notionError && <p className="text-sm text-destructive">{notionError}</p>}
+          {notionPageUrl && (
+            <a
+              href={notionPageUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="text-sm text-primary underline"
+            >
+              Notion에서 보기
+            </a>
+          )}
         </CardContent>
       </Card>
 
