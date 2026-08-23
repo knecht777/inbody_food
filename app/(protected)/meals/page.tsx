@@ -71,9 +71,10 @@ export default function MealsPage() {
     setUploading(true);
     setError(null);
     const mealId = newMealId(user.uid);
+    const eatenAt = new Date().toISOString();
 
     try {
-      await createUploadingMeal(user.uid, mealId, mealType);
+      await createUploadingMeal(user.uid, mealId, mealType, eatenAt);
       await refresh(user.uid);
 
       const imageUrl = await uploadMealPhoto(user, mealId, file);
@@ -92,7 +93,7 @@ export default function MealsPage() {
 
       if (!response.ok) throw new Error("analysis failed");
       const { foodItems } = (await response.json()) as { foodItems: FoodItem[] };
-      await completeMealAnalysis(user.uid, mealId, foodItems);
+      await completeMealAnalysis(user.uid, mealId, foodItems, eatenAt);
     } catch {
       await markMealSyncFailed(user.uid, mealId);
       setError("AI 분석에 실패했습니다. 사진은 저장되었으니 직접 입력해 주세요.");
@@ -103,15 +104,15 @@ export default function MealsPage() {
     }
   }
 
-  async function handleSaveItems(mealId: string, foodItems: FoodItem[]) {
+  async function handleSaveItems(mealId: string, eatenAt: string, foodItems: FoodItem[]) {
     if (!user) return;
-    await updateMealFoodItems(user.uid, mealId, foodItems);
+    await updateMealFoodItems(user.uid, mealId, foodItems, eatenAt);
     await refresh(user.uid);
   }
 
-  async function handleDelete(mealId: string) {
+  async function handleDelete(mealId: string, eatenAt: string) {
     if (!user) return;
-    await deleteMeal(user.uid, mealId);
+    await deleteMeal(user.uid, mealId, eatenAt);
     await refresh(user.uid);
   }
 
@@ -170,8 +171,8 @@ export default function MealsPage() {
             <MealCard
               key={meal.id}
               meal={meal}
-              onSave={(foodItems) => handleSaveItems(meal.id, foodItems)}
-              onDelete={() => handleDelete(meal.id)}
+              onSave={(foodItems) => handleSaveItems(meal.id, meal.eatenAt, foodItems)}
+              onDelete={() => handleDelete(meal.id, meal.eatenAt)}
             />
           ))}
         </div>

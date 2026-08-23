@@ -10,6 +10,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
+import { dateIdFor, recalculateDailyNutrition } from "@/services/nutrition/dailyNutrition";
 import type { FoodItem } from "@/types/Food";
 import type { Meal } from "@/types/Meal";
 import type { Nutrition } from "@/types/Nutrition";
@@ -38,12 +39,13 @@ export async function createUploadingMeal(
   uid: string,
   mealId: string,
   mealType: Meal["mealType"],
+  eatenAt: string,
 ): Promise<void> {
   const now = new Date().toISOString();
   const meal: Meal = {
     id: mealId,
     userId: uid,
-    eatenAt: now,
+    eatenAt,
     mealType,
     status: "uploading",
     foodItems: [],
@@ -62,13 +64,19 @@ export async function markMealAnalyzing(uid: string, mealId: string, imageUrl: s
   });
 }
 
-export async function completeMealAnalysis(uid: string, mealId: string, foodItems: FoodItem[]) {
+export async function completeMealAnalysis(
+  uid: string,
+  mealId: string,
+  foodItems: FoodItem[],
+  eatenAt: string,
+) {
   await updateDoc(doc(mealsRef(uid), mealId), {
     foodItems,
     totalNutrition: sumNutrition(foodItems),
     status: "completed",
     updatedAt: new Date().toISOString(),
   });
+  await recalculateDailyNutrition(uid, dateIdFor(new Date(eatenAt)));
 }
 
 export async function markMealSyncFailed(uid: string, mealId: string) {
@@ -78,16 +86,23 @@ export async function markMealSyncFailed(uid: string, mealId: string) {
   });
 }
 
-export async function updateMealFoodItems(uid: string, mealId: string, foodItems: FoodItem[]) {
+export async function updateMealFoodItems(
+  uid: string,
+  mealId: string,
+  foodItems: FoodItem[],
+  eatenAt: string,
+) {
   await updateDoc(doc(mealsRef(uid), mealId), {
     foodItems,
     totalNutrition: sumNutrition(foodItems),
     updatedAt: new Date().toISOString(),
   });
+  await recalculateDailyNutrition(uid, dateIdFor(new Date(eatenAt)));
 }
 
-export async function deleteMeal(uid: string, mealId: string) {
+export async function deleteMeal(uid: string, mealId: string, eatenAt: string) {
   await deleteDoc(doc(mealsRef(uid), mealId));
+  await recalculateDailyNutrition(uid, dateIdFor(new Date(eatenAt)));
 }
 
 export async function listRecentMeals(uid: string, count = 20): Promise<Meal[]> {
